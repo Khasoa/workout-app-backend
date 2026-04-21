@@ -4,7 +4,7 @@
 
 Workout API Backend is a Flask REST API designed for personal trainers to manage workouts and reusable exercises. Trainers can create workouts, create exercises, attach exercises to workouts, and track sets, reps, or duration.
 
-The project demonstrates Flask backend development using SQLAlchemy ORM, Marshmallow serialization, model validations, schema validations, relational database design, and RESTful routing.
+The project demonstrates backend development using Flask, SQLAlchemy ORM, Marshmallow serialization, relational database design, schema validation, model validation, and RESTful API architecture.
 
 ---
 
@@ -60,7 +60,7 @@ python server/seed.py
 ## Run Application
 
 ```bash
-python server/app.py
+python -m server.app
 ```
 
 Server runs on:
@@ -94,8 +94,9 @@ POST `/workouts/<workout_id>/exercises/<exercise_id>/workout_exercises` — Add 
 ---
 
 ## Testing
-
-cd server && python -m pytest ../tests/test_basic.py -v
+Run tests using pytest
+or
+python -m pytest tests/basic_test.py -v
 
 All endpoints were tested using cURL commands in the terminal.
 
@@ -140,6 +141,23 @@ Verified outcomes:
 * Join table endpoint successfully linked workouts and exercises
 
 ---
+
+## Pipfile
+
+This project uses Pipenv for dependency management.
+
+To install dependencies:
+
+pipenv install
+
+To activate environment:
+
+pipenv shell
+
+All dependencies are tracked in:
+
+Pipfile
+Pipfile.lock
 
 ## Author
 

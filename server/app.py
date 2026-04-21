@@ -1,7 +1,7 @@
 from flask import Flask, request, jsonify, make_response
 from marshmallow import ValidationError
 
-from server.extensions import db
+from server.extensions import db, migrate
 from server.models import Workout, Exercise, WorkoutExercise
 from server.schemas import (
     exercise_schema, exercises_schema,
@@ -17,10 +17,9 @@ def create_app():
     app.config["SQLALCHEMY_TRACK_MODIFICATIONS"] = False
 
     db.init_app(app)
+    migrate.init_app(app, db)
 
-    with app.app_context():
-        import server.models   # ensures models register with SQLAlchemy
-        db.create_all()
+    from server import models
 
     # ─────────────────────────────────────────────
     # ALL ROUTES MUST BE INSIDE HERE
@@ -112,7 +111,6 @@ def create_app():
     return app
 
 
-app = create_app()
-
 if __name__ == "__main__":
+    app = create_app()
     app.run(port=5555, debug=True)
