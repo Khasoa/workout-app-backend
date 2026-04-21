@@ -1,9 +1,8 @@
-from flask_sqlalchemy import SQLAlchemy
+from server.extensions import db
 from sqlalchemy.orm import validates
 from sqlalchemy import CheckConstraint
 from datetime import date as date_type
  
-db = SQLAlchemy()
 
 # ── Exercise ──
 # Reusable exercises a trainer can attach to many workouts.

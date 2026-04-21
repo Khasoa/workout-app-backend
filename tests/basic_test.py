@@ -5,7 +5,7 @@ Tests cover:
   - Schema validations (marshmallow)
   - All API endpoints (status codes + response shape)
 """
- 
+
 import sys
 import os
 import pytest
@@ -13,23 +13,25 @@ from datetime import date, timedelta
  
 # Make sure the server/ directory is on the Python path
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), "..", "server"))
- 
-from app import app as flask_app
-from models import db, Workout, Exercise, WorkoutExercise
+
+from server.app import create_app
+from server.models import db, Workout, Exercise, WorkoutExercise
  
  
 # ── Fixtures ──────────────────────────────────────────────────────────────────
  
 @pytest.fixture
 def app():
-    """Configure Flask for testing: in-memory SQLite, no propagated exceptions."""
-    flask_app.config.update({
+    app = create_app()
+
+    app.config.update({
         "TESTING": True,
         "SQLALCHEMY_DATABASE_URI": "sqlite:///:memory:",
     })
-    with flask_app.app_context():
+
+    with app.app_context():
         db.create_all()
-        yield flask_app
+        yield app
         db.session.remove()
         db.drop_all()
  
@@ -121,35 +123,35 @@ class TestSchemaValidations:
  
     def test_exercise_schema_rejects_short_name(self):
         """Schema should reject names shorter than 2 characters before hitting the model."""
-        from schemas import exercise_schema
+        from server.schemas import exercise_schema
         from marshmallow import ValidationError
         with pytest.raises(ValidationError):
             exercise_schema.load({"name": "A", "category": "strength"})
  
     def test_exercise_schema_rejects_invalid_category(self):
         """Schema category @validates should reject non-whitelisted values."""
-        from schemas import exercise_schema
+        from server.schemas import exercise_schema
         from marshmallow import ValidationError
         with pytest.raises(ValidationError):
             exercise_schema.load({"name": "Squat", "category": "legs"})
  
     def test_workout_schema_rejects_zero_duration(self):
         """Schema should reject duration_minutes <= 0."""
-        from schemas import workout_schema
+        from server.schemas import workout_schema
         from marshmallow import ValidationError
         with pytest.raises(ValidationError):
             workout_schema.load({"date": "2024-04-01", "duration_minutes": 0})
  
     def test_workout_schema_requires_date(self):
         """Missing date field should raise ValidationError."""
-        from schemas import workout_schema
+        from server.schemas import workout_schema
         from marshmallow import ValidationError
         with pytest.raises(ValidationError):
             workout_schema.load({"duration_minutes": 30})
  
     def test_workout_exercise_schema_rejects_negative_reps(self):
         """Schema should reject negative reps."""
-        from schemas import workout_exercise_schema
+        from server.schemas import workout_exercise_schema
         from marshmallow import ValidationError
         with pytest.raises(ValidationError):
             workout_exercise_schema.load({"reps": -5})
